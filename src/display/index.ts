@@ -1,0 +1,1 @@
+export { renderToTerminal } from './terminal';
