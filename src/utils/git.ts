@@ -8,34 +8,53 @@ export async function collectCommitData(
   repoPath: string,
   author?: string,
   since?: string,
+  branch?: string,
 ): Promise<CommitData[]> {
   const git: SimpleGit = simpleGit(repoPath);
 
   // Verify this is a git repository
   const isRepo = await git.checkIsRepo();
   if (!isRepo) {
-    throw new Error(`"${repoPath}" is not a Git repository. Please run gitroast inside a Git repo.`);
+    throw new Error(
+      `"${repoPath}" is not a Git repository. Please run gitroast inside a Git repo.`,
+    );
   }
 
-  // Build log options
-  const logOptions: Record<string, string | undefined> = {
-    '--stat': undefined,
-    '--stat-count': '1000',
-  };
+  // Validate branch exists if specified
+  if (branch) {
+    const branches = await git.branch(['-a']);
+    const allBranches = Object.keys(branches.branches);
+    const match = allBranches.some((b) => b === branch || b === `remotes/origin/${branch}`);
+    if (!match) {
+      throw new Error(
+        `Branch "${branch}" not found. Available branches: ${allBranches.filter((b) => !b.startsWith('remotes/')).join(', ')}`,
+      );
+    }
+  }
+
+  // Build log args as array so we can optionally pass a branch name
+  const logArgs: string[] = ['--stat', '--stat-count=1000'];
+
+  if (branch) {
+    logArgs.push(branch);
+  } else {
+    logArgs.push('--all');
+  }
 
   if (author) {
-    logOptions['--author'] = author;
+    logArgs.push(`--author=${author}`);
   }
 
   if (since) {
-    logOptions['--since'] = since;
+    logArgs.push(`--since=${since}`);
   }
 
-  const log: LogResult = await git.log(logOptions);
+  const log: LogResult = await git.log(logArgs);
 
   if (log.all.length === 0) {
     throw new Error(
       'No commits found. ' +
+        (branch ? `No commits on branch "${branch}". ` : '') +
         (author ? `No commits by author "${author}". ` : '') +
         'Make sure you are in a Git repository with commit history.',
     );
