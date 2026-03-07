@@ -10,9 +10,11 @@ Your commits tell a story. Git Roast makes sure it's a comedy.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-brightgreen.svg?style=flat-square)](https://nodejs.org)
 
-</div>
+<br/>
 
----
+![gitroast](gitroast.png)
+
+</div>
 
 ## What is this?
 
