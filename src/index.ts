@@ -17,14 +17,16 @@ program
   .description('🍖 Analyzes your Git history and roasts your coding habits')
   .version('1.0.0')
   .option('-a, --author <name>', 'Filter commits by author name')
-  .option('-s, --since <date>', 'Only analyze commits since this date (e.g., "2024-01-01" or "6 months ago")')
+  .option('-b, --branch <name>', 'Only analyze commits from a specific branch')
+  .option(
+    '-s, --since <date>',
+    'Only analyze commits since this date (e.g., "2024-01-01" or "6 months ago")',
+  )
   .option('-p, --path <dir>', 'Path to Git repository (defaults to current directory)')
   .option('--ai', 'Use an AI/LLM to generate roasts (requires GITROAST_API_KEY in .env)')
   .action(async (options) => {
     try {
-      const repoPath = options.path
-        ? path.resolve(options.path)
-        : process.cwd();
+      const repoPath = options.path ? path.resolve(options.path) : process.cwd();
 
       // Step 1: Collect git data
       const spinner = ora({
@@ -34,15 +36,13 @@ program
 
       let commits;
       try {
-        commits = await collectCommitData(repoPath, options.author, options.since);
+        commits = await collectCommitData(repoPath, options.author, options.since, options.branch);
       } catch (error) {
         spinner.fail(chalk.red((error as Error).message));
         process.exit(1);
       }
 
-      spinner.text = chalk.cyan(
-        `Found ${commits.length} commits. Analyzing your sins...`,
-      );
+      spinner.text = chalk.cyan(`Found ${commits.length} commits. Analyzing your sins...`);
 
       // Step 2: Analyze
       const stats = await analyzeAll(commits, repoPath, options.author);
