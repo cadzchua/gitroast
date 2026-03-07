@@ -16,7 +16,7 @@ Your commits tell a story. Git Roast makes sure it's a comedy.
 
 ## What is this?
 
-Git Roast reads through your commit history and roasts you for your habits. It looks at:
+Git Roast scans your **entire repository** — every branch, every author, every commit — and roasts you for your habits. It looks at:
 
 - **When** you commit — 3 AM pushes don't go unnoticed
 - **What** you write in commit messages — or the lack thereof
@@ -25,31 +25,77 @@ Git Roast reads through your commit history and roasts you for your habits. It l
 
 You get a score, a grade, and a set of personalized roasts.
 
-## Installation
-
-```bash
-# Run instantly with npx (no install needed)
-npx gitroast
-
-# Or install globally
-npm install -g gitroast
-```
-
 ## Usage
 
+### Option 1: npx (Recommended)
+
+No install needed — just run it inside any Git repository:
+
 ```bash
-# Roast yourself in the current repo
-gitroast
-
-# Roast a specific author
-gitroast --author "John Doe"
-
-# Only analyze recent commits
-gitroast --since "6 months ago"
-
-# Roast a different repo
-gitroast --path /path/to/repo
+npx gitroast
 ```
+
+By default, gitroast analyzes the **entire repo** across all branches. Use flags to narrow it down:
+
+```bash
+# Roast a specific author
+npx gitroast --author "John Doe"
+
+# Only analyze a specific branch
+npx gitroast --branch main
+
+# Only analyze commits after a certain date
+npx gitroast --since "6 months ago"
+
+# Roast a repo in a different directory
+npx gitroast --path /path/to/repo
+
+# Use AI-powered roasts
+npx gitroast --ai
+
+# Combine flags
+npx gitroast --branch dev --author "Jane" --since "2024-01-01"
+```
+
+### Option 2: Run from Source
+
+Clone the repo and run it locally:
+
+```bash
+# Install dependencies and build
+npm install
+npm run build
+
+# Link it globally so you can run `gitroast` anywhere
+npm link
+```
+
+Then use it like any other command:
+
+```bash
+gitroast
+gitroast --author "Jane"
+gitroast --since "2024-01-01"
+gitroast --path /path/to/some/other/repo
+```
+
+To unlink later:
+
+```bash
+npm unlink -g gitroast
+```
+
+## Options
+
+| Flag                  | Description                          | Example                     |
+| --------------------- | ------------------------------------ | --------------------------- |
+| `-a, --author <name>` | Filter commits by a specific author  | `gitroast -a "Jane"`        |
+| `-b, --branch <name>` | Only analyze a specific branch       | `gitroast -b main`          |
+| `-s, --since <date>`  | Only analyze commits after this date | `gitroast -s "2024-01-01"`  |
+| `-p, --path <dir>`    | Path to a Git repository             | `gitroast -p ../other-repo` |
+| `--ai`                | Use an LLM to generate roasts        | `gitroast --ai`             |
+| `-V, --version`       | Show version number                  | `gitroast -V`               |
+| `-h, --help`          | Show help                            | `gitroast -h`               |
 
 ## Example Output
 
@@ -94,13 +140,13 @@ gitroast --path /path/to/repo
 
 ## Scoring
 
-| Level | Score | Description |
-|-------|-------|-------------|
-| Golden Developer | 80-100 | You're suspiciously good. Are you even human? |
-| Decent Human | 60-79 | Normal dev. Some bad habits, but who doesn't? |
-| Chaotic Neutral | 40-59 | You commit crimes against Git. Sometimes literally. |
-| Code Gremlin | 20-39 | Your Git history is a crime scene. |
-| Absolute Menace | 0-19 | You should be banned from version control. |
+| Level            | Score  | Description                                         |
+| ---------------- | ------ | --------------------------------------------------- |
+| Golden Developer | 80-100 | You're suspiciously good. Are you even human?       |
+| Decent Human     | 60-79  | Normal dev. Some bad habits, but who doesn't?       |
+| Chaotic Neutral  | 40-59  | You commit crimes against Git. Sometimes literally. |
+| Code Gremlin     | 20-39  | Your Git history is a crime scene.                  |
+| Absolute Menace  | 0-19   | You should be banned from version control.          |
 
 ## AI-Powered Roasts
 
@@ -131,25 +177,14 @@ gitroast --ai
 
 Anything that speaks the OpenAI chat completions format works. Just swap the base URL:
 
-| Provider | Base URL | Example Model |
-|----------|----------|---------------|
-| OpenAI | `https://api.openai.com/v1` (default) | `gpt-4o-mini` |
-| Groq | `https://api.groq.com/openai/v1` | `llama-3.3-70b-versatile` |
-| Ollama | `http://localhost:11434/v1` | `llama3` |
-| Together AI | `https://api.together.xyz/v1` | `meta-llama/Meta-Llama-3-70B` |
+| Provider    | Base URL                              | Example Model                 |
+| ----------- | ------------------------------------- | ----------------------------- |
+| OpenAI      | `https://api.openai.com/v1` (default) | `gpt-4o-mini`                 |
+| Groq        | `https://api.groq.com/openai/v1`      | `llama-3.3-70b-versatile`     |
+| Ollama      | `http://localhost:11434/v1`           | `llama3`                      |
+| Together AI | `https://api.together.xyz/v1`         | `meta-llama/Meta-Llama-3-70B` |
 
 If the API call fails for any reason, gitroast falls back to the built-in template roasts automatically.
-
-## Options
-
-| Flag | Description | Example |
-|------|-------------|---------|
-| `-a, --author <name>` | Filter commits by author | `gitroast -a "Jane"` |
-| `-s, --since <date>` | Analyze commits after date | `gitroast -s "2024-01-01"` |
-| `-p, --path <dir>` | Path to Git repository | `gitroast -p ../other-repo` |
-| `--ai` | Use an LLM to generate roasts | `gitroast --ai` |
-| `-V, --version` | Show version number | `gitroast -V` |
-| `-h, --help` | Show help | `gitroast -h` |
 
 ## Contributing
 
