@@ -1,0 +1,53 @@
+{
+  "name": "gitroast",
+  "version": "1.0.0",
+  "description": "🍖 A CLI tool that analyzes your Git history and roasts your coding habits",
+  "main": "dist/index.js",
+  "bin": {
+    "gitroast": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "roast",
+    "cli",
+    "humor",
+    "developer-tools",
+    "git-analytics",
+    "commit-analysis"
+  ],
+  "author": "cadzchua",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cadzchua/gitroast.git"
+  },
+  "homepage": "https://github.com/cadzchua/gitroast#readme",
+  "bugs": {
+    "url": "https://github.com/cadzchua/gitroast/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "dotenv": "^17.3.1",
+    "ora": "^5.4.1",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
