@@ -7,8 +7,9 @@
 Your commits tell a story. Git Roast makes sure it's a comedy.
 
 [![npm version](https://img.shields.io/npm/v/gitroast.svg?style=flat-square)](https://www.npmjs.com/package/gitroast)
+[![CI](https://img.shields.io/github/actions/workflow/status/cadzchua/gitroast/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/cadzchua/gitroast/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D16-brightgreen.svg?style=flat-square)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg?style=flat-square)](https://nodejs.org)
 
 <br/>
 
@@ -25,177 +26,241 @@ Git Roast scans your **entire repository** — every branch, every author, every
 - **How** consistently you commit — streaks, droughts, the works
 - **What** you change — 100 files in one commit? bold move
 
-You get a score, a grade, and a set of personalized roasts.
+You get a letter-graded score across four categories and a set of personalized roasts. Outputs can be consumed as plain terminal text, JSON (for scripting), or Markdown (for sharing).
 
-## Usage
+## Quick start
 
-### Option 1: npx (Recommended)
-
-No install needed — just run it inside any Git repository:
+### Run without installing
 
 ```bash
 npx gitroast
 ```
 
-By default, gitroast analyzes the **entire repo** across all branches. Use flags to narrow it down:
+### Or install globally
 
 ```bash
-# Roast a specific author
-npx gitroast --author "John Doe"
-
-# Only analyze a specific branch
-npx gitroast --branch main
-
-# Only analyze commits after a certain date
-npx gitroast --since "6 months ago"
-
-# Roast a repo in a different directory
-npx gitroast --path /path/to/repo
-
-# Use AI-powered roasts
-npx gitroast --ai
-
-# Combine flags
-npx gitroast --branch dev --author "Jane" --since "2024-01-01"
+npm install -g gitroast
+gitroast
 ```
 
-### Option 2: Run from Source
-
-Clone the repo and run it locally:
+### Or run from source
 
 ```bash
-# Install dependencies and build
+git clone https://github.com/cadzchua/gitroast.git
+cd gitroast
 npm install
 npm run build
-
-# Link it globally so you can run `gitroast` anywhere
 npm link
-```
-
-Then use it like any other command:
-
-```bash
 gitroast
-gitroast --author "Jane"
-gitroast --since "2024-01-01"
-gitroast --path /path/to/some/other/repo
 ```
 
-To unlink later:
+## Usage
 
 ```bash
-npm unlink -g gitroast
+# Default: analyze everything
+gitroast
+
+# Filter by author (multi-author: comma-separated)
+gitroast --author "Alice"
+gitroast --author "Alice,Bob"
+
+# Filter by branch and time range
+gitroast --branch main --since "6 months ago"
+
+# Run it against a different repo
+gitroast --path ../some-other-repo
+
+# Only keep the top 3 roasts
+gitroast --top 3
+
+# Output machine-readable JSON
+gitroast --format json
+
+# Export to Markdown
+gitroast --format markdown --output roast.md
+
+# Use AI-generated roasts (requires GITROAST_API_KEY)
+gitroast --ai
+
+# Disable colors
+gitroast --no-color
 ```
 
-## Options
+### Team mode
 
-| Flag                  | Description                          | Example                     |
-| --------------------- | ------------------------------------ | --------------------------- |
-| `-a, --author <name>` | Filter commits by a specific author  | `gitroast -a "Jane"`        |
-| `-b, --branch <name>` | Only analyze a specific branch       | `gitroast -b main`          |
-| `-s, --since <date>`  | Only analyze commits after this date | `gitroast -s "2024-01-01"`  |
-| `-p, --path <dir>`    | Path to a Git repository             | `gitroast -p ../other-repo` |
-| `--ai`                | Use an LLM to generate roasts        | `gitroast --ai`             |
-| `-V, --version`       | Show version number                  | `gitroast -V`               |
-| `-h, --help`          | Show help                            | `gitroast -h`               |
+See who on your team has the worst Git hygiene:
 
-## Example Output
-
+```bash
+gitroast --team
 ```
-  ┌─────────────────────────────────────────────┐
-  │                                             │
-  │   🔥  G I T   R O A S T  🍖              │
-  │   Brutally honest Git analysis              │
-  │                                             │
-  └─────────────────────────────────────────────┘
 
-  📊 Stats for: cadzchua @ my-project
-     Total Commits: 342 | First: Jan 3, 2024 | Active Days: 89
+Produces a leaderboard of every author in the repo, ranked by overall score.
 
-  ┌──────────────────────┬──────────┬────────────┐
-  │ Category             │  Grade   │  Score     │
-  ├──────────────────────┼──────────┼────────────┤
-  │ ⏰ Timing            │   C-     │ 42/100     │
-  │ 💬 Messages          │   D      │ 31/100     │
-  │ 📈 Patterns          │   B+     │ 78/100     │
-  │ 📁 Files             │   B      │ 71/100     │
-  └──────────────────────┴──────────┴────────────┘
+### Compare mode
 
-  🏆 Overall: 🎲 CHAOTIC NEUTRAL (55/100)
+Pit two developers head-to-head:
 
-  ═══════════════════════════════════════════
-
-  🔥 YOUR ROASTS:
-
-  ⏰ 73% of your commits are after midnight. Your code has
-     insomnia and so do your bugs. [SAVAGE]
-
-  💬 Your average commit message is 4 characters. A sneeze
-     contains more information. [SAVAGE]
-
-  📈 You mass-committed 187 files on a Friday at 5:47 PM.
-     We all know what happened there. [SAVAGE]
-
-  📁 You've deleted more lines than you've added. Are you
-     building something or just destroying evidence? [SAVAGE]
+```bash
+gitroast --compare "Alice,Bob"
 ```
+
+## CLI options
+
+| Flag                    | Description                                                | Default     |
+| ----------------------- | ---------------------------------------------------------- | ----------- |
+| `-a, --author <names>`  | Filter by author (comma-separated for multiple)            | all authors |
+| `-b, --branch <name>`   | Only analyze a specific branch                             | all         |
+| `-s, --since <date>`    | Only include commits after this date                       | all time    |
+| `-p, --path <dir>`      | Path to a Git repository                                   | `.`         |
+| `-t, --top <n>`         | Max number of roasts to show                               | `8`         |
+| `-f, --format <type>`   | Output format: `terminal`, `json`, `markdown`              | `terminal`  |
+| `-o, --output <file>`   | Write output to a file instead of stdout                   | stdout      |
+| `--ai`                  | Use an LLM to generate roasts (requires `GITROAST_API_KEY`) | off         |
+| `--team`                | Build a leaderboard across all authors                     | off         |
+| `--compare <a,b>`       | Compare two authors head-to-head                           | off         |
+| `--no-color`            | Disable colored output                                     | colors on   |
+| `-V, --version`         | Show version number                                        |             |
+| `-h, --help`            | Show help                                                  |             |
+
+## Configuration file
+
+Override any threshold with a `.gitroastrc` or `.gitroastrc.json` in the repo root (or your home directory). Unknown keys are ignored; missing keys fall back to defaults.
+
+```json
+{
+  "lateNightStartHour": 21,
+  "lateNightEndHour": 6,
+  "bigDumpFileThreshold": 30,
+  "maxRoasts": 5,
+  "extraLazyPatterns": [
+    { "pattern": "^ugh$", "label": "ugh" },
+    { "pattern": "^f+$", "label": "fffff" }
+  ]
+}
+```
+
+Full list of tunable keys lives in [src/config.ts](src/config.ts).
 
 ## Scoring
 
+Each commit is graded across four dimensions. Lower score = worse habits = harder roast.
+
 | Level            | Score  | Description                                         |
 | ---------------- | ------ | --------------------------------------------------- |
-| Golden Developer | 80-100 | You're suspiciously good. Are you even human?       |
-| Decent Human     | 60-79  | Normal dev. Some bad habits, but who doesn't?       |
-| Chaotic Neutral  | 40-59  | You commit crimes against Git. Sometimes literally. |
-| Code Gremlin     | 20-39  | Your Git history is a crime scene.                  |
-| Absolute Menace  | 0-19   | You should be banned from version control.          |
+| Golden Developer | 80–100 | You're suspiciously good. Are you even human?       |
+| Decent Human     | 60–79  | Normal dev. Some bad habits, but who doesn't?       |
+| Chaotic Neutral  | 40–59  | You commit crimes against Git. Sometimes literally. |
+| Code Gremlin     | 20–39  | Your Git history is a crime scene.                  |
+| Absolute Menace  | 0–19   | You should be banned from version control.          |
 
-## AI-Powered Roasts
+## AI-powered roasts
 
-The built-in roasts are fun, but if you want something more creative you can plug in your own LLM. Pass the `--ai` flag and gitroast will send your stats to an OpenAI-compatible API and let the model write the roasts for you.
+The template-based roasts are fun, but you can plug in any OpenAI-compatible LLM for more creative output.
 
-### Setup
-
-Create a `.env` file in the directory where you run gitroast:
+Create a `.env` file in the working directory:
 
 ```bash
-# Required — your API key
 GITROAST_API_KEY=sk-your-api-key-here
-
-# Optional — defaults to gpt-4o-mini
-GITROAST_MODEL=gpt-4o-mini
-
-# Optional — defaults to OpenAI, but any compatible endpoint works
-GITROAST_API_BASE=https://api.openai.com/v1
+GITROAST_MODEL=gpt-4o-mini                    # optional
+GITROAST_API_BASE=https://api.openai.com/v1   # optional
 ```
 
-Then run:
+Then:
 
 ```bash
 gitroast --ai
 ```
 
-### Compatible Providers
+### Compatible providers
 
-Anything that speaks the OpenAI chat completions format works. Just swap the base URL:
-
-| Provider    | Base URL                              | Example Model                 |
+| Provider    | Base URL                              | Example model                 |
 | ----------- | ------------------------------------- | ----------------------------- |
 | OpenAI      | `https://api.openai.com/v1` (default) | `gpt-4o-mini`                 |
 | Groq        | `https://api.groq.com/openai/v1`      | `llama-3.3-70b-versatile`     |
 | Ollama      | `http://localhost:11434/v1`           | `llama3`                      |
 | Together AI | `https://api.together.xyz/v1`         | `meta-llama/Meta-Llama-3-70B` |
 
-If the API call fails for any reason, gitroast falls back to the built-in template roasts automatically.
+If the API call fails, gitroast falls back to built-in templates automatically.
+
+## Output formats
+
+**Terminal** (default): Pretty, colored, boxed output for reading in a shell.
+
+**JSON**: Full roast result including stats, per-category scores, and roast text. Easy to pipe into `jq` or dashboards.
+
+```bash
+gitroast --format json | jq '.score.overall'
+```
+
+**Markdown**: Self-contained `.md` document with a summary table and roast list, suitable for Slack/GitHub/Notion.
+
+```bash
+gitroast --format markdown --output roast.md
+```
+
+## Development
+
+```bash
+# Install deps
+npm install
+
+# Run tests
+npm test                 # one-shot
+npm run test:watch       # watch mode
+npm run test:coverage    # with coverage
+
+# Type check without building
+npm run typecheck
+
+# Lint and format
+npm run lint
+npm run format
+
+# Build to dist/
+npm run build
+
+# Run in dev mode (uses ts-node, no build needed)
+npm run dev
+```
+
+## Architecture
+
+```
+src/
+├── index.ts              # CLI entrypoint (commander)
+├── config.ts             # Tunable thresholds + .gitroastrc loader
+├── errors.ts             # Typed error hierarchy
+├── types/                # Shared TypeScript interfaces
+├── utils/git.ts          # simple-git wrapper
+├── analyzers/            # Pure functions that turn commits into stats
+│   ├── timing.ts
+│   ├── messages.ts
+│   ├── patterns.ts
+│   └── files.ts
+├── roaster/              # Turn stats into roasts
+│   ├── scoring.ts
+│   ├── templates.ts
+│   ├── llm.ts
+│   └── index.ts
+├── display/              # Output renderers
+│   ├── terminal.ts
+│   ├── json.ts
+│   └── markdown.ts
+└── modes/                # Extra CLI modes
+    ├── team.ts
+    └── compare.ts
+```
+
+All analyzers are pure functions with full test coverage. Swap the renderer, tune the scoring, add a template — everything is decoupled.
 
 ## Contributing
 
-Contributions are welcome — new roast templates, bug fixes, features, whatever.
+Contributions welcome — new roast templates, bug fixes, features, whatever. Please run `npm run lint && npm test` before opening a PR.
 
 1. Fork the repo
 2. Create a feature branch (`git checkout -b feature/savage-roasts`)
-3. Make your changes
-4. Commit with a good message (we'll know if you don't)
+3. Make your changes + add tests
+4. Run `npm test && npm run lint`
 5. Open a PR
 
 ## License

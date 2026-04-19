@@ -25,7 +25,7 @@ export const ROAST_TEMPLATES: RoastTemplate[] = [
     messages: [
       (s) =>
         `${Math.round(s.timing.lateNightPercentage)}% of your commits are after midnight. Your code has insomnia and so do your bugs.`,
-      (s) =>
+      () =>
         `Over half your commits happen between 10 PM and 5 AM. Have you considered that sleep might improve your code quality?`,
       (s) =>
         `${Math.round(s.timing.lateNightPercentage)}% late-night commits. Your keyboard should file a restraining order.`,
@@ -39,7 +39,8 @@ export const ROAST_TEMPLATES: RoastTemplate[] = [
     messages: [
       (s) =>
         `${Math.round(s.timing.lateNightPercentage)}% of your commits are late-night sessions. You're not a night owl — you're a code bat.`,
-      () => `You code at night like a vampire. Except vampires are immortal and your code has bugs.`,
+      () =>
+        `You code at night like a vampire. Except vampires are immortal and your code has bugs.`,
     ],
   },
   {
@@ -138,7 +139,8 @@ export const ROAST_TEMPLATES: RoastTemplate[] = [
     category: 'messages',
     emoji: '💬',
     severity: 'medium',
-    condition: (s) => s.messages.lazyMessagePercentage > 10 && s.messages.lazyMessagePercentage <= 30,
+    condition: (s) =>
+      s.messages.lazyMessagePercentage > 10 && s.messages.lazyMessagePercentage <= 30,
     messages: [
       (s) =>
         `${Math.round(s.messages.lazyMessagePercentage)}% lazy commit messages. You write code for a living but can't write a sentence about it.`,
@@ -172,7 +174,8 @@ export const ROAST_TEMPLATES: RoastTemplate[] = [
     category: 'messages',
     emoji: '🔄',
     severity: 'medium',
-    condition: (s) => s.messages.repeatedMessages.length > 0 && s.messages.repeatedMessages[0].count > 5,
+    condition: (s) =>
+      s.messages.repeatedMessages.length > 0 && s.messages.repeatedMessages[0].count > 5,
     messages: [
       (s) =>
         `"${s.messages.repeatedMessages[0].message}" — you used this message ${s.messages.repeatedMessages[0].count} times. Ever heard of copy-paste? Oh wait, that IS your commit strategy.`,

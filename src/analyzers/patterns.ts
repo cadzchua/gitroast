@@ -1,14 +1,14 @@
 import { CommitData, PatternAnalysis, BigDump } from '../types';
-
-/** Threshold for considering a commit a "big dump" (number of files) */
-const BIG_DUMP_FILE_THRESHOLD = 20;
-const BIG_DUMP_CHANGE_THRESHOLD = 500;
+import { GitRoastConfig, DEFAULT_CONFIG } from '../config';
 
 /**
  * Analyzes commit frequency patterns.
  * Detects streaks, droughts, big dumps, and consistency.
  */
-export function analyzePatterns(commits: CommitData[]): PatternAnalysis {
+export function analyzePatterns(
+  commits: CommitData[],
+  config: GitRoastConfig = DEFAULT_CONFIG,
+): PatternAnalysis {
   if (commits.length === 0) {
     return {
       longestStreak: 0,
@@ -22,10 +22,8 @@ export function analyzePatterns(commits: CommitData[]): PatternAnalysis {
     };
   }
 
-  // Sort commits by date (oldest first)
   const sorted = [...commits].sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  // Get unique active days
   const activeDays = new Set<string>();
   for (const commit of sorted) {
     activeDays.add(toDateKey(commit.date));
@@ -36,16 +34,14 @@ export function analyzePatterns(commits: CommitData[]): PatternAnalysis {
   const lastDate = sorted[sorted.length - 1].date;
   const totalDaysSpan = Math.max(1, daysBetween(firstDate, lastDate) + 1);
 
-  // Calculate streaks and droughts
   const sortedDays = Array.from(activeDays).sort();
   const { longestStreak, currentStreak, longestDrought } = calculateStreaks(sortedDays);
 
-  // Detect big dumps (unusually large commits)
   const bigDumps: BigDump[] = sorted
     .filter(
       (c) =>
-        c.filesChanged >= BIG_DUMP_FILE_THRESHOLD ||
-        c.insertions + c.deletions >= BIG_DUMP_CHANGE_THRESHOLD,
+        c.filesChanged >= config.bigDumpFileThreshold ||
+        c.insertions + c.deletions >= config.bigDumpChangeThreshold,
     )
     .map((c) => ({
       hash: c.hash.substring(0, 7),
@@ -54,9 +50,8 @@ export function analyzePatterns(commits: CommitData[]): PatternAnalysis {
       filesChanged: c.filesChanged,
       totalChanges: c.insertions + c.deletions,
     }))
-    .slice(0, 5); // Top 5
+    .slice(0, 5);
 
-  // Consistency score: ratio of active days to total span (0-100)
   const consistencyScore = Math.round((totalActiveDays / totalDaysSpan) * 100);
 
   return {
@@ -71,7 +66,6 @@ export function analyzePatterns(commits: CommitData[]): PatternAnalysis {
   };
 }
 
-/** Calculates longest streak, current streak, and longest drought from sorted date keys */
 function calculateStreaks(sortedDays: string[]): {
   longestStreak: number;
   currentStreak: number;
@@ -99,7 +93,6 @@ function calculateStreaks(sortedDays: string[]): {
     }
   }
 
-  // Current streak: count back from the end only if the last active day is today or yesterday
   const today = toDateKey(new Date());
   const yesterday = toDateKey(new Date(Date.now() - 86400000));
   const lastDay = sortedDays[sortedDays.length - 1];
@@ -118,19 +111,13 @@ function calculateStreaks(sortedDays: string[]): {
     }
   }
 
-  return {
-    longestStreak,
-    currentStreak: currentStreakCount,
-    longestDrought,
-  };
+  return { longestStreak, currentStreak: currentStreakCount, longestDrought };
 }
 
-/** Converts a Date to a YYYY-MM-DD string */
 function toDateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-/** Calculates the number of days between two dates */
 function daysBetween(a: Date, b: Date): number {
   const msPerDay = 86400000;
   return Math.round(Math.abs(b.getTime() - a.getTime()) / msPerDay);

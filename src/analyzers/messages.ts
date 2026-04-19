@@ -1,7 +1,8 @@
 import { CommitData, MessageAnalysis, LazyMessageMatch, RepeatedMessage } from '../types';
+import { GitRoastConfig, DEFAULT_CONFIG } from '../config';
 
 /** Patterns that indicate lazy commit messages */
-const LAZY_PATTERNS: { pattern: RegExp; label: string }[] = [
+const BUILTIN_LAZY_PATTERNS: { pattern: RegExp; label: string }[] = [
   { pattern: /^fix$/i, label: 'fix' },
   { pattern: /^fix\s*(bug|typo|it|stuff|things)?$/i, label: 'fix *' },
   { pattern: /^wip$/i, label: 'wip' },
@@ -38,7 +39,21 @@ const LAZY_PATTERNS: { pattern: RegExp; label: string }[] = [
  * Analyzes commit message quality.
  * Detects lazy messages, repeated messages, and message length patterns.
  */
-export function analyzeMessages(commits: CommitData[]): MessageAnalysis {
+export function analyzeMessages(
+  commits: CommitData[],
+  config: GitRoastConfig = DEFAULT_CONFIG,
+): MessageAnalysis {
+  const extraPatterns = config.extraLazyPatterns
+    .map((p) => {
+      try {
+        return { pattern: new RegExp(p.pattern, p.flags ?? 'i'), label: p.label };
+      } catch {
+        return null;
+      }
+    })
+    .filter((p): p is { pattern: RegExp; label: string } => p !== null);
+  const LAZY_PATTERNS = [...BUILTIN_LAZY_PATTERNS, ...extraPatterns];
+
   if (commits.length === 0) {
     return {
       averageLength: 0,

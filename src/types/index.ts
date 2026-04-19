@@ -136,4 +136,3 @@ export interface RoastResult {
   score: RoastScore;
   stats: AnalysisResult;
 }
-

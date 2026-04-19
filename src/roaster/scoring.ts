@@ -1,4 +1,4 @@
-import { AnalysisResult, RoastScore, RoastLevel, CategoryScore, RoastCategory } from '../types';
+import { AnalysisResult, RoastScore, RoastLevel, CategoryScore } from '../types';
 
 /**
  * Calculates per-category scores and an overall roast level.
@@ -18,9 +18,7 @@ export function calculateScore(stats: AnalysisResult): RoastScore {
     { category: 'files', score: fileScore, ...toGrade(fileScore, 'Files') },
   ];
 
-  const overall = Math.round(
-    (timingScore + messageScore + patternScore + fileScore) / 4,
-  );
+  const overall = Math.round((timingScore + messageScore + patternScore + fileScore) / 4);
 
   const level = getLevel(overall);
 

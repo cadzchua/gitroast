@@ -35,7 +35,10 @@ export function analyzeFiles(commits: CommitData[]): FileAnalysis {
   }
 
   const averageFilesPerCommit = Math.round((totalFilesChanged / commits.length) * 100) / 100;
-  const addDeleteRatio = totalDeletions > 0 ? Math.round((totalInsertions / totalDeletions) * 100) / 100 : totalInsertions;
+  const addDeleteRatio =
+    totalDeletions > 0
+      ? Math.round((totalInsertions / totalDeletions) * 100) / 100
+      : totalInsertions;
 
   return {
     totalFilesChanged,
