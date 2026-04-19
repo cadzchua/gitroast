@@ -82,7 +82,6 @@ function calculateStreaks(sortedDays: string[]): {
   }
 
   let longestStreak = 1;
-  let currentStreakCount = 1;
   let longestDrought = 0;
   let streakCount = 1;
 
@@ -92,23 +91,21 @@ function calculateStreaks(sortedDays: string[]): {
     const gap = daysBetween(prevDate, currDate);
 
     if (gap === 1) {
-      // Consecutive days
       streakCount++;
       longestStreak = Math.max(longestStreak, streakCount);
     } else {
-      // Streak broken
       longestDrought = Math.max(longestDrought, gap - 1);
       streakCount = 1;
     }
   }
 
-  // Current streak: check if the last active day is today or yesterday
+  // Current streak: count back from the end only if the last active day is today or yesterday
   const today = toDateKey(new Date());
   const yesterday = toDateKey(new Date(Date.now() - 86400000));
   const lastDay = sortedDays[sortedDays.length - 1];
+  let currentStreakCount = 0;
 
   if (lastDay === today || lastDay === yesterday) {
-    // Count backward from the end
     currentStreakCount = 1;
     for (let i = sortedDays.length - 2; i >= 0; i--) {
       const currDate = new Date(sortedDays[i + 1]);
@@ -119,8 +116,6 @@ function calculateStreaks(sortedDays: string[]): {
         break;
       }
     }
-  } else {
-    currentStreakCount = 0;
   }
 
   return {

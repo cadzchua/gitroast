@@ -116,7 +116,7 @@ function buildUserPrompt(stats: AnalysisResult, score: RoastScore): string {
 - Longest drought: ${patterns.longestDrought} days
 - Consistency: ${patterns.consistencyScore}% (${patterns.totalActiveDays} active days out of ${patterns.totalDaysSpan})
 - Avg commits/active day: ${patterns.averageCommitsPerDay}
-- Big dumps (50+ files): ${patterns.bigDumps.length}
+- Big dumps (20+ files or 500+ line changes): ${patterns.bigDumps.length}
 
 ## Files
 - Avg files per commit: ${files.averageFilesPerCommit}

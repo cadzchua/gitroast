@@ -62,10 +62,10 @@ export function analyzeMessages(commits: CommitData[]): MessageAnalysis {
 
   for (const msg of messages) {
     for (const { pattern, label } of LAZY_PATTERNS) {
-      if (pattern.test(msg.trim())) {
+      if (pattern.test(msg)) {
         lazyCounts.set(label, (lazyCounts.get(label) || 0) + 1);
         totalLazy++;
-        break; // Only match first pattern
+        break;
       }
     }
   }
@@ -77,7 +77,7 @@ export function analyzeMessages(commits: CommitData[]): MessageAnalysis {
   // Find repeated messages
   const messageCounts = new Map<string, number>();
   for (const msg of messages) {
-    const normalized = msg.toLowerCase().trim();
+    const normalized = msg.toLowerCase();
     messageCounts.set(normalized, (messageCounts.get(normalized) || 0) + 1);
   }
 

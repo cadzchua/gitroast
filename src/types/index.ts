@@ -137,9 +137,3 @@ export interface RoastResult {
   stats: AnalysisResult;
 }
 
-/** CLI options */
-export interface CLIOptions {
-  author?: string;
-  since?: string;
-  path?: string;
-}
